@@ -1,3 +1,25 @@
+/*
+
+[ X ] - Handle Collision
+[ ] - Dynamic Resizing
+[ ] - Key Value Retrieval - Insertion - Deletion
+[ ] - Improved Hash Function
+[ ] - Load Factor calculation
+[ ] - Null Key Handling
+[ ] - Memory management
+[ ] - Error Handling
+[ ] - Debugging Output
+[ ] - Iterators
+[ ] - Unit Tests
+[ ] - Configurable Size
+[ ] - String Key Management
+[ ] - Handle Collision
+[ ] - Long Term Storage
+[ ] - Documentation
+[ ] - Performance Measurement
+
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,26 +27,30 @@
 #define P 53
 #define M 1000000007
 
-typedef struct {
-    char* key;
-    char* value;
+typedef struct
+{
+    char *key;
+    char *value;
 } ht_item;
 
-typedef struct{
+typedef struct
+{
     int size;
     int count;
-    ht_item** items;
+    ht_item **items;
 } ht_table;
 
-static ht_item* ht_new_item(char* k, char* v){
-    ht_item* i = malloc(sizeof(ht_item));
+static ht_item *ht_new_item(char *k, char *v)
+{
+    ht_item *i = malloc(sizeof(ht_item));
     i->key = strdup(k);
     i->value = strdup(v);
     return i;
 }
 
-ht_table* ht_new(){
-    ht_table* ht = malloc(sizeof(ht_table));
+ht_table *ht_new()
+{
+    ht_table *ht = malloc(sizeof(ht_table));
 
     ht->count = 0;
     ht->size = 53;
@@ -53,7 +79,8 @@ void ht_del_hash_table(ht_table *ht)
     free(ht);
 }
 
-int compute_hash(const char *s){
+int compute_hash(const char *s)
+{
     int hash_value = 0;
     int p_pow = 1;
 
@@ -66,8 +93,14 @@ int compute_hash(const char *s){
     return hash_value;
 }
 
-
-/// nice ///
+// hash_table.c
+static int ht_get_hash(
+    const char *s, const int num_buckets, const int attempt)
+{
+    const int hash_a = compute_hash(s);
+    const int hash_b = compute_hash(s);
+    return (hash_a + (attempt * (hash_b + 1))) % num_buckets;
+}
 
 int main()
 {
@@ -78,8 +111,8 @@ int main()
     ht_item *item2 = ht_new_item("age", "30");
 
     // Add them to the hash table
-    int index1 = compute_hash(item1->key) % table->size;
-    int index2 = compute_hash(item2->key) % table->size;
+    int index1 = ht_get_hash(item1->key, P, M) % table->size;
+    int index2 = ht_get_hash(item2->key, P, M) % table->size;
 
     table->items[index1] = item1;
     table->items[index2] = item2;
