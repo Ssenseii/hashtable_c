@@ -116,6 +116,41 @@ static int ht_get_hash(
     return (hash_a + (attempt * (hash_b + 1))) % num_buckets;
 }
 
+void ht_remove(ht_table *ht, ht_item *item)
+{
+    int index = ht_get_hash(item->key, ht->size, 0);
+    if (ht->items[index] != NULL)
+    {
+        index = ht_get_hash(item->key, ht->size, 1);
+        if (ht->items[index] != NULL)
+        {
+            printf("Key Doesn't Exist");
+        }
+    }
+
+    ht_del_item(item);
+    ht->count--;
+
+    printf("Removed item\n");
+    printf("Current Count = %d\n", ht->count);
+}
+
+void ht_insert(ht_table *ht, ht_item *item)
+{
+    int index = ht_get_hash(item->key, ht->size, 0);
+    if (ht->items[index] != NULL)
+    {
+        index = ht_get_hash(item->key, ht->size, 1);
+        
+    }
+
+    ht->items[index] = item;
+    ht->count++;
+
+    printf("Added item: key = %s, value = %s\n", ht->items[index]->key, ht->items[index]->value);
+    printf("Current Count = %d\n", ht->count);
+}
+
 int main()
 {
     ht_table *table = ht_new();
@@ -126,29 +161,15 @@ int main()
 
     int index1, index2;
     // Add them to the hash table
-    index1 = ht_get_hash(item1->key, table->size, 0); // Attempt 0 for the first item
-    if (table->items[index1] != NULL)                 // Check for collision
-    {
-        index1 = ht_get_hash(item1->key, table->size, 1); // Try the next attempt
-    }
-    table->items[index1] = item1;
-    table->count++;
-
-    index2 = ht_get_hash(item2->key, table->size, 0); // Attempt 0 for the second item
-    if (table->items[index2] != NULL)                 // Check for collision
-    {
-        index2 = ht_get_hash(item2->key, table->size, 1); // Try the next attempt
-    }
-    table->items[index2] = item2;
-    table->count++;
+    
+    ht_insert(table, item1);
+    ht_insert(table, item2);
+    ht_remove(table, item1);
 
     // Print added items
-    printf("Added item: key = %s, value = %s\n", table->items[index1]->key, table->items[index1]->value);
-    printf("Added item: key = %s, value = %s\n", table->items[index2]->key, table->items[index2]->value);
 
     // Clean up
     ht_del_hash_table(table);
-
 
     return 0;
 }
