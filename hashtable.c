@@ -24,8 +24,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define INIT_SIZE 53
 #define P 53
 #define M 1000000007
+#define LOAD_FACTOR_THRES 0.7
 
 // this is an item in the Hash table
 typedef struct
@@ -52,12 +54,12 @@ static ht_item *ht_new_item(char *k, char *v)
 }
 
 // this is for creating a new table.
-ht_table *ht_new()
+ht_table *ht_new(int size)
 {
     ht_table *ht = malloc(sizeof(ht_table));
 
     ht->count = 0;
-    ht->size = 53;
+    ht->size = size;
     ht->items = calloc((size_t)ht->size, sizeof(ht_item *));
 
     return ht;
@@ -141,7 +143,6 @@ void ht_insert(ht_table *ht, ht_item *item)
     if (ht->items[index] != NULL)
     {
         index = ht_get_hash(item->key, ht->size, 1);
-        
     }
 
     ht->items[index] = item;
@@ -151,9 +152,38 @@ void ht_insert(ht_table *ht, ht_item *item)
     printf("Current Count = %d\n", ht->count);
 }
 
+void ht_resize(ht_table *ht, int new_size)
+{
+    ht_table *new_ht = ht_new(new_size);
+
+    for (int i = 0; i < ht->size; i++)
+    {
+        ht_item *item = ht->items[i];
+        if (item != NULL)
+        {
+            ht_insert(new_ht, item); /// rehashing the items from start.
+        }
+    }
+
+    free(ht->items);
+    ht->size = new_ht->size;
+    ht->count = new_ht->count;
+    free(new_ht);
+}
+
+void ht_resize_if_needed(ht_table *ht)
+{
+    float load_factor = (float)ht->count / ht->size;
+    if (load_factor > LOAD_FACTOR_THRES)
+    {
+        ht_resize(ht, ht->size * 2);
+    }
+}
+
+
 int main()
 {
-    ht_table *table = ht_new();
+    ht_table *table = ht_new(INIT_SIZE);
 
     // Adding some key-value pairs
     ht_item *item1 = ht_new_item("name", "Alice");
@@ -161,7 +191,7 @@ int main()
 
     int index1, index2;
     // Add them to the hash table
-    
+
     ht_insert(table, item1);
     ht_insert(table, item2);
     ht_remove(table, item1);
