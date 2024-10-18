@@ -4,7 +4,7 @@
 [ X ] - Dynamic Resizing
 [ X ] - Key Value Retrieval - Insertion - Deletion
 [ ] - Improved Hash Function
-[ ] - Load Factor calculation
+[ X ] - Load Factor calculation
 [ ] - Null Key Handling
 [ ] - Memory management
 [ ] - Error Handling
@@ -13,10 +13,11 @@
 [ ] - Unit Tests
 [ ] - Configurable Size
 [ ] - String Key Management
-[ ] - Handle Collision
+[ X ] - Handle Collision
 [ ] - Long Term Storage
 [ ] - Documentation
 [ ] - Performance Measurement
+[ X ] - Better CLI Interface
 
  */
 
@@ -155,7 +156,7 @@ void ht_insert(ht_table *ht, ht_item *item)
 void ht_retrieve(ht_table *ht, char *key)
 {
     int index = ht_get_hash(key, ht->size, 0);
-    if (ht->items[index] != NULL)
+    if (ht->items[index] != NULL && strcmp(ht->items[index]->key, key) == 0)
     {
         printf("Item Found: \n Key = %s \n Value = %s", ht->items[index]->key, ht->items[index]->value);
     }
@@ -195,24 +196,107 @@ void ht_resize_if_needed(ht_table *ht)
 
 int main()
 {
+    // ht_table *table = ht_new(INIT_SIZE);
+
+    // // Adding some key-value pairs
+    // ht_item *item1 = ht_new_item("name", "Alice");
+    // ht_item *item2 = ht_new_item("age", "30");
+
+    // int index1, index2;
+    // // Add them to the hash table
+
+    // ht_insert(table, item1);
+    // ht_insert(table, item2);
+    // ht_remove(table, item1);
+    // ht_retrieve(table, "age");
+
+    // // Print added items
+
+    // // Clean up
+    // ht_del_hash_table(table);
+
+    // return 0;
+
     ht_table *table = ht_new(INIT_SIZE);
+    int choice;
+    char key[256], value[256];
 
-    // Adding some key-value pairs
-    ht_item *item1 = ht_new_item("name", "Alice");
-    ht_item *item2 = ht_new_item("age", "30");
+    printf("=== Hash Table Interface ===\n");
+    while (1)
+    {
+        printf("\nSelect an operation:\n");
+        printf("1. Add Item\n");
+        printf("2. Remove Item\n");
+        printf("3. Search for Item\n");
+        printf("4. Print Hash Table\n");
+        printf("5. Display Stats\n");
+        printf("0. Exit\n");
+        printf("Choice: ");
+        scanf("%d", &choice);
 
-    int index1, index2;
-    // Add them to the hash table
+        switch (choice)
+        {
+        // Add Item
+        case 1:
+            printf("Adding Item...\n");
+            printf("Enter Key: ");
+            scanf("%s", key);
+            printf("Enter Value: ");
+            scanf("%s", value);
+            ht_insert(table, ht_new_item(key, value));
+            break;
 
-    ht_insert(table, item1);
-    ht_insert(table, item2);
-    ht_remove(table, item1);
-    ht_retrieve(table, "age");
+        // Remove Item
+        case 2:
+            printf("Removing Item...\n ");
+            printf("Enter Key: ");
+            scanf("%s", key);
+            ht_item *item_to_remove = ht_new_item(key, "");
+            ht_remove(table, item_to_remove);
+            free(item_to_remove);
+            break;
 
-    // Print added items
+        // Retrieve an Item
+        case 3:
+            printf("Retrieving Item...\n ");
+            printf("Enter Key: ");
+            scanf("%s", key);
+            ht_retrieve(table, key);
+            break;
 
-    // Clean up
-    ht_del_hash_table(table);
+        // Print Hashtable
+        case 4:
+            printf("=== Hash Table ===\n");
+            for (int i = 0; i < table->size; i++)
+            {
+                if (table->items[i] != NULL)
+                {
+                    printf("[%d]: %s -> %s\n", i, table->items[i]->key, table->items[i]->value);
+                }
+                else
+                {
+                    printf("[%d]: NULL\n", i);
+                }
+            }
+            break;
 
-    return 0;
+        // Display Stats
+        case 5:
+            printf("=== Hash Table Stats ===\n");
+            printf("Size: %d\n", table->size);
+            printf("Count: %d\n", table->count);
+            printf("Load Factor: %.2f\n", (float)table->count / table->size);
+            break;
+
+        // Exit
+        case 0:
+            printf("Exiting...\n");
+            ht_del_hash_table(table);
+            return 0;
+
+        default:
+            printf("Invalid choice. Try again.\n");
+            break;
+        }
+    }
 }
