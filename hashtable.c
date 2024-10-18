@@ -14,7 +14,7 @@
 [ ] - Configurable Size
 [ ] - String Key Management
 [ X ] - Handle Collision
-[ ] - Long Term Storage
+[ X ] - Long Term Storage
 [ ] - Documentation
 [ ] - Performance Measurement
 [ X ] - Better CLI Interface
@@ -45,16 +45,30 @@ typedef struct
     ht_item **items;
 } ht_table;
 
-// this is for creating an item using a key-value pair
+
+/*
+* @brief Creates a new hashtable item with the given key value pair.
+* @param k pointer to a nul-terminated string representing the key
+* @param v point to a null-terminated string representing the value
+* @return pointer to the newly allocated ht_item struct.
+*/
 static ht_item *ht_new_item(char *k, char *v)
 {
     ht_item *i = malloc(sizeof(ht_item));
+    if (i == NULL)
+    {
+        return NULL; // Handle memory allocation failure
+    }
     i->key = strdup(k);
     i->value = strdup(v);
     return i;
 }
 
-// this is for creating a new table.
+/*
+ * @brief Creates a new hashtable with a specified size in the main function.
+ * @param size integer representing the initial size of the hashtable
+ * @return hashtable allocated within the memory with a count of 0 items.
+ */
 ht_table *ht_new(int size)
 {
     ht_table *ht = malloc(sizeof(ht_table));
