@@ -1,8 +1,8 @@
 /*
 
 [ X ] - Handle Collision
-[ ] - Dynamic Resizing
-[ ] - Key Value Retrieval - Insertion - Deletion
+[ X ] - Dynamic Resizing
+[ X ] - Key Value Retrieval - Insertion - Deletion
 [ ] - Improved Hash Function
 [ ] - Load Factor calculation
 [ ] - Null Key Handling
@@ -152,6 +152,19 @@ void ht_insert(ht_table *ht, ht_item *item)
     printf("Current Count = %d\n", ht->count);
 }
 
+void ht_retrieve(ht_table *ht, char *key)
+{
+    int index = ht_get_hash(key, ht->size, 0);
+    if (ht->items[index] != NULL)
+    {
+        printf("Item Found: \n Key = %s \n Value = %s", ht->items[index]->key, ht->items[index]->value);
+    }
+    else
+    {
+        printf("Item Not Found\n");
+    };
+}
+
 void ht_resize(ht_table *ht, int new_size)
 {
     ht_table *new_ht = ht_new(new_size);
@@ -180,7 +193,6 @@ void ht_resize_if_needed(ht_table *ht)
     }
 }
 
-
 int main()
 {
     ht_table *table = ht_new(INIT_SIZE);
@@ -195,6 +207,7 @@ int main()
     ht_insert(table, item1);
     ht_insert(table, item2);
     ht_remove(table, item1);
+    ht_retrieve(table, "age");
 
     // Print added items
 
