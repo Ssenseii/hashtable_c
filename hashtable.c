@@ -194,6 +194,59 @@ void ht_resize_if_needed(ht_table *ht)
     }
 }
 
+/*
+    Long Term Storage
+*/
+
+void save_table(ht_table *ht, const char *filename)
+{
+    FILE *file = fopen(filename, "w");
+
+    if (!file)
+    {
+        perror("Failed to open file");
+        return;
+    }
+
+    for (int i = 0; i < ht->size; i++)
+    {
+        if (ht->items[i] != NULL)
+        {
+            fprintf(file, "%s->%s\n", ht->items[i]->key, ht->items[i]->value);
+        }
+    }
+
+    fclose(file);
+    printf("Table Saved Succesfully to %s", filename);
+}
+
+void load_table(ht_table *ht, const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+
+    if (!file)
+    {
+        perror("Failed to open file");
+        return;
+    }
+
+    char line[256];
+
+    while (fgets(line, sizeof(line), file))
+    {
+        char *key = strtok(line, "->");
+        char *value = strtok(NULL, "\n");
+        
+        if (key && value)
+        {
+            ht_insert(ht, ht_new_item(key, value));
+        }
+    }
+
+    fclose(file);
+    printf("Table Loaded Succesfully to %s", filename);
+}
+
 int main()
 {
     // ht_table *table = ht_new(INIT_SIZE);
@@ -220,6 +273,7 @@ int main()
     ht_table *table = ht_new(INIT_SIZE);
     int choice;
     char key[256], value[256];
+    const char *filename = "hashtable_data.csv";
 
     printf("=== Hash Table Interface ===\n");
     while (1)
@@ -230,6 +284,8 @@ int main()
         printf("3. Search for Item\n");
         printf("4. Print Hash Table\n");
         printf("5. Display Stats\n");
+        printf("6. Save Table to File\n");
+        printf("7. Load Table from File\n");
         printf("0. Exit\n");
         printf("Choice: ");
         scanf("%d", &choice);
@@ -287,6 +343,15 @@ int main()
             printf("Count: %d\n", table->count);
             printf("Load Factor: %.2f\n", (float)table->count / table->size);
             break;
+
+        case 6: // Save Table to File
+            save_table(table, filename);
+            break;
+
+        case 7: // Load Table from File
+            load_table(table, filename);
+            break;
+
 
         // Exit
         case 0:
