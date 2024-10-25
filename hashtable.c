@@ -24,11 +24,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define INIT_SIZE 53
 #define P 53
 #define M 1000000007
 #define LOAD_FACTOR_THRES 0.7
+
+#define MAX_KEY_SIZE 64
+#define MAX_VALUE_SIZE 256
 
 // this is an item in the Hash table
 typedef struct
@@ -45,13 +49,43 @@ typedef struct
     ht_item **items;
 } ht_table;
 
+// Helper Functions
+void trim_newline(char *str)
+{
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n')
+    {
+        str[len - 1] > '\0';
+    }
+}
+
+// check if the key is non-null and non-empty
+int is_valid_key(const char *key)
+{
+    if (key == NULL || strlen(key) == 0)
+    {
+        printf("Error: Key Cannot Be Empty");
+        return 0;
+    }
+
+    for (size_t i = 0; i < strlen(key); i++)
+    {
+        if (!isalnum(key[i]))
+        {
+            printf("Error: Key can only contain alphanumeric characters.\n");
+            return 0;
+        }
+    }
+
+    return 1;
+}
 
 /*
-* @brief Creates a new hashtable item with the given key value pair.
-* @param k pointer to a nul-terminated string representing the key
-* @param v point to a null-terminated string representing the value
-* @return pointer to the newly allocated ht_item struct.
-*/
+ * @brief Creates a new hashtable item with the given key value pair.
+ * @param k pointer to a nul-terminated string representing the key
+ * @param v point to a null-terminated string representing the value
+ * @return pointer to the newly allocated ht_item struct.
+ */
 static ht_item *ht_new_item(char *k, char *v)
 {
     ht_item *i = malloc(sizeof(ht_item));
@@ -250,7 +284,7 @@ void load_table(ht_table *ht, const char *filename)
     {
         char *key = strtok(line, "->");
         char *value = strtok(NULL, "\n");
-        
+
         if (key && value)
         {
             ht_insert(ht, ht_new_item(key, value));
@@ -286,7 +320,7 @@ int main()
 
     ht_table *table = ht_new(INIT_SIZE);
     int choice;
-    char key[256], value[256];
+    char key[MAX_KEY_SIZE], value[MAX_VALUE_SIZE];
     const char *filename = "hashtable_data.csv";
 
     printf("=== Hash Table Interface ===\n");
@@ -365,7 +399,6 @@ int main()
         case 7: // Load Table from File
             load_table(table, filename);
             break;
-
 
         // Exit
         case 0:
